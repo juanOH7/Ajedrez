@@ -1,51 +1,92 @@
 #include <ncurses.h>
-#include <string.h>
+#include <string>
 #include <cmath>
 
 using std::abs;
+using std::string;
 
 int** contructorArray(int, int);
 void destructorArray(int**,int);
 void impTablero(int**, int, int);
 void llenarTablero(int**, int,int);
-char* movimientoFun(int,int);
+char* movimientoFun(int);
+void textoMov(char*,int,int);
 void deleteMov(char*);
+void cambiarTablero(int**,char*);
 int coorX(char*);
 int coorX2(char*);
 int coorY(char*);
 int coorY2(char*);
 bool validarPiezaSel(int**,int,char*);
-bool validarMoviento(char*, int, int**,int,int, int);
+bool validarMoviento(char*, int, int**,int,int);
 bool validarRey(char*,int**);
 bool validarTorre(char*,int**);
 bool validarAlfil(char*,int**);
 bool validarCab(char*,int**);
-bool validarPeon(char*, int, int, int**);
+bool validarPeon(char*, int, int**);
 bool validarReina(char*,int**);
 bool piezaComePieza(char*, int, int**);
-bool pasoLibre(char*, int, int, int**);
+bool pasoLibre(char*, int, int**);
 
 int main(int argc, char const *argv[])
 {
 	initscr();
+    start_color();
 	const int columns = 8;//x
 	const int rows = 8;//y
 	const int cantChars = 5;
 	int** tableroMain = contructorArray(columns, rows);
 	llenarTablero(tableroMain,columns, rows);//Defaulr
-	char* movimientoMa = movimientoFun(1,cantChars);
-	bool seguirJuego = true;
-	if (validarMoviento(movimientoMa, 1, tableroMain,columns, rows, 1) == true)
+	bool seguir = true, posiblePrbl = true;
+	int turno = 1, turnoJug1=1, turnoJug2=1;
+	char* movimiento1 = movimientoFun(cantChars);
+	do
 	{
-		addch('s');
-	}else {
-		addch('n');
-	}
-	int turno = 1;
-	impTablero(tableroMain, columns, rows);
+		if (turno == 1)
+		{
+			impTablero(tableroMain, columns, rows);
+			while(posiblePrbl)
+			{
+				textoMov(movimiento1, cantChars, turno);
+				getch();
+				refresh();
+				if (validarMoviento(movimiento1, turno, tableroMain,columns, rows) == true)
+				{
+					turno =2;
+					posiblePrbl = false;
+				}
+				else
+				{
+					posiblePrbl = true;
+				}
+			}
+			posiblePrbl = true;
+		}
+		else if (turno = 2)
+		{
+			impTablero(tableroMain, columns, rows);
+			while(posiblePrbl)
+			{
+				textoMov(movimiento1, cantChars, turno);
+				getch();
+				refresh();
+				if (validarMoviento(movimiento1, turno, tableroMain,columns, rows) == true)
+				{
+					turno =1;
+					posiblePrbl = false;
+				}
+				else
+				{
+					posiblePrbl = true;
+				}
+			}
+			posiblePrbl = true;
+		}
+	} while (seguir);
 	destructorArray(tableroMain, rows);
-	deleteMov(movimientoMa);
+	deleteMov(movimiento1);
 	getch();
+	refresh();
 	endwin();
 	return 0;
 }
@@ -66,41 +107,44 @@ void destructorArray(int** tablero, int row)
 	}
 	delete [] tablero;
 }
-char* movimientoFun(int turno, int numChars)
+void textoMov(char* movimiento, int numChars, int turno)
 {
-	char* movimiento1 = new char[numChars];
 	int contador =0;
+	int moveX = 15;
 	while(contador < (numChars -1) ){
 		if (turno == 1)
 		{
 			/* Jugador 1 - Blancas */
+			mvprintw(20,0, "Jugador 1");
 		}else
 		{
 			/* Jugador 2 - Negras */
+			mvprintw(20,0, "Jugador 2");
 		}
 		noecho();
 		char temp;
 		temp = getch();
 		if( ((temp >= 65 && temp <= 72) || (temp >= 97 && temp <= 104)) && ((contador == 0) || contador ==2) ){
 			echo();
-			addch(temp);
-			movimiento1[contador] = temp;
+			mvaddch(20,(moveX + contador),temp);
+			movimiento[contador] = temp;
 			contador++;
 		}
 		if(  (temp >= '0' && temp <= '7') && ((contador == 1) || contador==3) ){
 			echo();
-			addch(temp);
-			movimiento1[contador] = temp;
+			mvaddch(20,(moveX + contador),temp);
+			movimiento[contador] = temp;
 			contador++;
 		}
 	}
-	movimiento1[numChars] = '\0';
+	movimiento[numChars] = '\0';
+}
+char* movimientoFun(int numChars)
+{
+	char* movimiento1 = new char[numChars];	
 	return movimiento1;
 }
-void deleteMov(char* coord)
-{	
-	delete [] coord;
-}
+void deleteMov(char* coord){delete [] coord;}
 void llenarTablero(int** array, int col, int row)
 {
 	for (int i = 0; i < row; ++i)
@@ -153,14 +197,30 @@ void llenarTablero(int** array, int col, int row)
 		}
 	}
 }
+
 void impTablero(int** array, int col, int row)
 {
-	initscr();
-    start_color();
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_WHITE, COLOR_RED);
     init_pair(3, COLOR_WHITE, COLOR_BLACK);
     int desplasarHor = 2,desplasarVert =1;
+    mvprintw(2,3,"0");
+    mvprintw(4,3,"1");
+    mvprintw(6,3,"2");
+    mvprintw(8,3,"3");
+    mvprintw(10,3,"4");
+    mvprintw(12,3,"5");
+    mvprintw(14,3,"6");
+    mvprintw(16,3,"7");
+    mvprintw(1,8," A ");
+    mvprintw(1,12," B ");
+    mvprintw(1,16," C ");
+    mvprintw(1,20," D ");
+    mvprintw(1,24," E ");
+    mvprintw(1,28," F ");
+    mvprintw(1,32," G ");
+    mvprintw(1,36," H ");
+
 	for (int i = 0; i < row; ++i)
 	{
 		for (int j = 0; j < col; ++j)
@@ -220,9 +280,6 @@ void impTablero(int** array, int col, int row)
 			}
 		}
 	}
-	getch();
-	refresh();
-    endwin();
 }
 int coorX(char* coord)//Seleccionar
 {
@@ -284,58 +341,58 @@ int coorX2(char* coord)//Mover
 }
 int coorY(char* coord)
 {
-	char coordx[] = {'0','1','2','3','4','5','6','7','\0'};
-	if (  (coord[1]== coordx[0])  )
+	char coordy[] = {'0','1','2','3','4','5','6','7','\0'};
+	if (  (coord[1]== coordy[0])  )
 	{
 		return 0;
-	}else if ( (coord[1]==coordx[1]))
+	}else if ( (coord[1]==coordy[1]))
 	{
 		return 1;
-	}else if ((coord[1]==coordx[2] ))
+	}else if ((coord[1]==coordy[2] ))
 	{
 		return 2;
-	}else if ((coord[1] == coordx[3] ))
+	}else if ((coord[1] == coordy[3] ))
 	{
 		return 3;
-	}else if ((coord[1]== coordx[4] ))
+	}else if ((coord[1]== coordy[4] ))
 	{
 		return 4;
-	}else if ((coord[1] == coordx[5] ))
+	}else if ((coord[1] == coordy[5] ))
 	{
 		return 5;
-	}else if ((coord[1] == coordx[6] ))
+	}else if ((coord[1] == coordy[6] ))
 	{
 		return 6;
-	}else if (( coord[1] == coordx[7] ))
+	}else if (( coord[1] == coordy[7] ))
 	{
 		return 7;
 	}
 }
 int coorY2(char* coord)
 {
-	char coordx[] = {'0','1','2','3','4','5','6','7','\0'};
-	if (  (coord[3]== coordx[0])  )
+	char coordy[] = {'0','1','2','3','4','5','6','7','\0'};
+	if (  (coord[3]== coordy[0])  )
 	{
 		return 0;
-	}else if ( (coord[3]==coordx[1]))
+	}else if ( (coord[3]==coordy[1]))
 	{
 		return 1;
-	}else if ((coord[3]==coordx[2] ))
+	}else if ((coord[3]==coordy[2] ))
 	{
 		return 2;
-	}else if ((coord[3] == coordx[3] ))
+	}else if ((coord[3] == coordy[3] ))
 	{
 		return 3;
-	}else if ((coord[3]== coordx[4] ))
+	}else if ((coord[3]== coordy[4] ))
 	{
 		return 4;
-	}else if ((coord[3] == coordx[5] ))
+	}else if ((coord[3] == coordy[5] ))
 	{
 		return 5;
-	}else if ((coord[3] == coordx[6] ))
+	}else if ((coord[3] == coordy[6] ))
 	{
 		return 6;
-	}else if (( coord[3] == coordx[7] ))
+	}else if (( coord[3] == coordy[7] ))
 	{
 		return 7;
 	}
@@ -363,7 +420,7 @@ bool validarPiezaSel(int** array,int turno, char* coord)
 		}
 	}
 }
-bool validarMoviento(char* coord, int turno, int** array,int col, int row, int turnoJug)
+bool validarMoviento(char* coord, int turno, int** array,int col, int row)
 {
 	int posx = coorX(coord);
 	int posy = coorY(coord);
@@ -371,8 +428,9 @@ bool validarMoviento(char* coord, int turno, int** array,int col, int row, int t
 	int posy2 = coorY2(coord);
 	if (validarPiezaSel(array, turno, coord))
 	{
-		if(pasoLibre(coord, turno, turnoJug, array))
+		if(pasoLibre(coord, turno, array))
 		{
+			cambiarTablero(array, coord);
 			return true;
 		}
 		else
@@ -383,7 +441,19 @@ bool validarMoviento(char* coord, int turno, int** array,int col, int row, int t
 		return false;
 	}
 }
-bool jaque(char* coord, int turno, int** array, int turnoJug)
+
+void cambiarTablero(int** array, char* coord)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int temp = array[posy][posx];
+	array[posy2][posx2] = temp;
+	array[posy][posx] = 13;
+}
+
+bool jaque(char* coord, int turno, int** array)
 {
 	int posx = coorX(coord);
 	int posy = coorY(coord);
@@ -473,7 +543,7 @@ bool validarReina(char* coord, int** array)
 	}
 }
 
-bool validarPeon(char* coord, int turnoJug, int turno, int** array)
+bool validarPeon(char* coord, int turno, int** array)
 {
 	int posx = coorX(coord);
 	int posy = coorY(coord);
@@ -481,9 +551,13 @@ bool validarPeon(char* coord, int turnoJug, int turno, int** array)
 	int posy2 = coorY2(coord);
 	if (turno == 1)
 	{
-		if (turnoJug == 1)
+		if (posy == 1)
 		{
-			if ( ( abs(posx - posx2) == 0) && ( (posy2 - posy) == 2 || (posy2 - posy) == 1) && (array[posy][posx] == 5 || array[posy][posx] == 12) )
+			if ( ( abs(posx - posx2) == 0) && ( (posy2 - posy) == 2 || (posy2 - posy) == 1) && (array[posy2][posx2] == 13) && (array[posy][posx] == 5 ) )
+			{
+				return true;
+			}
+			else if ( (posy2 == (posy + 1)) && (abs(posx - posx2) == 1) && (piezaComePieza(coord, turno, array)) && ( array[posy][posx] == 5 ) )
 			{
 				return true;
 			}
@@ -491,32 +565,36 @@ bool validarPeon(char* coord, int turnoJug, int turno, int** array)
 			{
 				return false;
 			}
-		}else if (turnoJug != 1)
+		}else if (posy != 1)
 		{
-			if ( ( abs(posx - posx2) == 0) && ( (posy2 - posy) == 1) && (array[posy][posx] == 5 || array[posy][posx] == 12) )
+			if ( ( abs(posx - posx2) == 0) && ( (posy2 - posy) == 1) &&(array[posy2][posx2] == 13) && ( array[posy][posx] == 5 ))
+			{
+				return true;
+			}
+			else if ( (posy2 == (posy + 1)) && (abs(posx - posx2) == 1) && (piezaComePieza(coord, turno, array)) && ( array[posy][posx] == 5 ))
 			{
 				return true;
 			}
 			else
-			{
-				return false;
-			}
-		}else if((piezaComePieza(coord, turno, array)) == true)
-		{
-			if ( (posy2 == (posy + 1)) && (abs(posx - posx2) == 1) && (array[posy][posx] == 5 || array[posy][posx] == 12))
-			{
-				return true;
-			}else
 			{
 				return false;
 			}
 		}
+		else 
+		{
+
+			return false;
+		}
 	}
 	else if (turno == 2)
 	{
-		if (turnoJug == 1)
+		if (posy == 6)
 		{
-			if ( ( abs(posx - posx2) == 0) && ( (posy - posy2) == 2 || (posy - posy2) == 1) && (array[posy][posx] == 5 || array[posy][posx] == 12) )
+			if  ( (abs(posx - posx2) == 0) && ((posy2 - posy) == 2 || (posy2 - posy2 == 1)) && (array[posy2][posx2] == 13) && (array[posy][posx] == 12 ) )
+			{
+				return true;
+			}
+			if ( (posy == (posy2 - 1) ) && (abs(posx - posx2) == 1) && (array[posy][posx] == 12) && (piezaComePieza(coord, turno, array)) )
 			{
 				return true;
 			}
@@ -524,9 +602,13 @@ bool validarPeon(char* coord, int turnoJug, int turno, int** array)
 			{
 				return false;
 			}
-		}else if (turnoJug != 1)
+		}else if (posy != 6)
 		{
-			if ( ( abs(posx - posx2) == 0) && ( (posy - posy2) == 1) && (array[posy][posx] == 5 || array[posy][posx] == 12) )
+			if ( ( abs(posx - posx2) == 0) && ( (posy - posy2) == 1) && (array[posy2][posx2] == 13) && (array[posy][posx] == 12 ) )
+			{
+				return true;
+			}
+			if ( (posy == (posy2 - 1) ) && (abs(posx - posx2) == 1) && (array[posy][posx] == 12) && (piezaComePieza(coord, turno, array)) )
 			{
 				return true;
 			}
@@ -534,15 +616,10 @@ bool validarPeon(char* coord, int turnoJug, int turno, int** array)
 			{
 				return false;
 			}
-		}else if((piezaComePieza(coord, turno, array)) == true)
+		}
+		else
 		{
-			if ( (posy2 == (posy + 1)) && (abs(posx - posx2) == 1) && (array[posy][posx] == 5 || array[posy][posx] == 12))
-			{
-				return true;
-			}else
-			{
-				return false;
-			}
+			return false;	
 		}
 	}	
 }
@@ -572,17 +649,17 @@ bool piezaComePieza(char* coord, int turno, int** array)
 	}
 }
 
-bool pasoLibre(char* coord, int turno, int turnoJug, int** array)
+bool pasoLibre(char* coord, int turno, int** array)
 {
 	int posx = coorX(coord);
 	int posy = coorY(coord);
 	int posx2 = coorX2(coord);
 	int posy2 = coorY2(coord);
-	int diff1 = abs(posx - posx2);
-	int diff2 = abs(posy - posy2);
-	if (validarTorre(coord, array) == true)
+	int diffX = abs(posx - posx2);
+	int diffY = abs(posy - posy2);
+	if (validarTorre(coord, array))
 	{
-		if (diff1 == 0)
+		if (diffX == 0)
 		{
 			if (posy < posy2)//vertical  AR-AB
 			{
@@ -598,7 +675,8 @@ bool pasoLibre(char* coord, int turno, int turnoJug, int** array)
 						return true;
 					}
 				}
-			}else if (posy > posy2)//vertical  AB-AR
+			}
+			else if (posy > posy2)//vertical  AB-AR
 			{
 				for (int i = (posy2+1) ; i < posy; --i)
 				{
@@ -614,7 +692,7 @@ bool pasoLibre(char* coord, int turno, int turnoJug, int** array)
 				}
 			}
 		}
-		else if (diff2 == 0)
+		else if (diffY == 0)
 		{
 			if (posx < posx2)
 			{
@@ -648,7 +726,7 @@ bool pasoLibre(char* coord, int turno, int turnoJug, int** array)
 			}
 		}
 	}
-	else if(validarAlfil(coord, array) == true)
+	else if(validarAlfil(coord, array))
 	{
 		for (int i = (posy+1); i < posy2; ++i)
 		{
@@ -666,67 +744,39 @@ bool pasoLibre(char* coord, int turno, int turnoJug, int** array)
 			}
 		}
 	}
-	else if (validarCab(coord, array) == true)
+	else if (validarCab(coord, array))
 	{
-		if (turno == 1)
+		if (piezaComePieza(coord, turno, array))
 		{
-			if (array[posy2][posx2] == 0 ||array[posy2][posx2] == 1 ||array[posy2][posx2] == 2 || array[posy2][posx2] == 3 || array[posy2][posx2] == 4 || array[posy2][posx2] == 5)
-			{
-				addch('H');
-				return false;
-			}
-			else
-			{
-				addch('c');
-				return true;
-			}
+			return true;
 		}
-		else if (turno == 2)
+		else if(array[posy2][posx2] == 13)
 		{
-			if (array[posy2][posx2] == 7 ||array[posy2][posx2] == 8 ||array[posy2][posx2] == 9 || array[posy2][posx2] == 10 || array[posy2][posx2] == 11 || array[posy2][posx2] == 12)
-			{
-				addch('H');
-				return false;
-			}
-			else
-			{
-				addch('c');
-				return true;
-			}
+			return true;
+		}
+		else
+		{
+			return true;
 		}
 	}
-	else if (validarRey(coord, array) == true)
+	else if (validarRey(coord, array))
 	{
-		if (turno == 1)
+		if (piezaComePieza(coord, turno, array))
 		{
-			if (array[posy2][posx2] == 0 ||array[posy2][posx2] == 1 ||array[posy2][posx2] == 2 || array[posy2][posx2] == 3 || array[posy2][posx2] == 4 || array[posy2][posx2] == 5)
-			{
-				addch('K');
-				return false;
-			}
-			else
-			{
-				addch('R');
-				return true;
-			}
+			return true;
 		}
-		else if (turno == 2)
+		else if(array[posy2][posx2] == 13)
 		{
-			if (array[posy2][posx2] == 7 ||array[posy2][posx2] == 8 ||array[posy2][posx2] == 9 || array[posy2][posx2] == 10 || array[posy2][posx2] == 11 || array[posy2][posx2] == 12)
-			{
-				addch('K');
-				return false;
-			}
-			else
-			{
-				addch('R');
-				return true;
-			}
+			return true;
+		}
+		else 
+		{
+			return false;
 		}
 	}
-	else if (validarReina(coord, array) == true)
+	else if (validarReina(coord, array))
 	{
-		if (diff1 == 0)
+		if (diffX == 0)
 		{
 			for (int i = (posy+1) ; i < posy2; ++i)
 			{
@@ -741,7 +791,7 @@ bool pasoLibre(char* coord, int turno, int turnoJug, int** array)
 				}
 			}
 		}
-		else if (diff2 == 0)
+		else if (diffY == 0)
 		{
 			for (int i = (posx+1) ; i < posx2; ++i)
 			{
@@ -757,57 +807,12 @@ bool pasoLibre(char* coord, int turno, int turnoJug, int** array)
 			}
 		}
 	}
-	else if (validarPeon(coord, turnoJug, turno, array) == true)
+	else if (validarPeon(coord, turno, array))
 	{
-		if (turno == 1)
-		{
-			if (array[posy2][posx2] == 0 ||array[posy2][posx2] == 1 ||array[posy2][posx2] == 2 || array[posy2][posx2] == 3 || array[posy2][posx2] == 4 || array[posy2][posx2] == 5)
-			{
-				addch('P');
-				return false;
-			}
-			else
-			{
-				addch('w');
-				return true;
-			}
-		}
-		else if (turno == 2)
-		{
-			if (array[posy2][posx2] == 7 ||array[posy2][posx2] == 8 ||array[posy2][posx2] == 9 || array[posy2][posx2] == 10 || array[posy2][posx2] == 11 || array[posy2][posx2] == 12)
-			{
-				addch('P');
-				return false;
-			}
-			else
-			{
-				addch('w');
-				return true;
-			}
-		}
+		return true;
 	}
 	else
 	{
-		addch('G');
 		return false;
 	}
 }
-
-/* 
-Jug1 Blancas
-valor 4- Torres
-valor 3- Bishops
-valor 2- Caballero
-valor 1- Rey
-valor 0- Reina
-valor 5- peones
-Jug2 Negras
-valor 7- Torres
-valor 8- Bishops
-valor 9- Caballero
-valor 10- Rey
-valor 11- Reina
-valor 12- peones
-Otros
-valor 13- vacio
-*/
