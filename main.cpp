@@ -27,6 +27,14 @@ bool validarPeon(char*, int, int**);
 bool validarReina(char*,int**);
 bool piezaComePieza(char*, int, int**);
 bool pasoLibre(char*, int, int**);
+bool diagonalBAJDEIZ(char*, int, int**);
+bool diagonalSUBDEIZ(char*, int, int** );
+bool diagonalBAJIZDE(char*, int, int** );
+bool diagonalSUBIZDE(char*,int , int** );
+bool rectaHorIZQDER(char*, int, int**);
+bool rectaHorDERIZQ(char*, int, int**);
+bool rectaVerArrAB(char*, int, int**);
+bool rectaVerAbArr(char*, int, int**);
 
 int main(int argc, char const *argv[])
 {
@@ -474,7 +482,7 @@ bool validarRey(char* coord, int** array)
 	int posy = coorY(coord);
 	int posx2 = coorX2(coord);
 	int posy2 = coorY2(coord);
-	if ( (( (abs(posx - posx2) == 1) || (abs(posx - posx2) == 0) ) && ( (abs(posy - posy2) == 1) || (abs(posy - posy2) == 0) ) && (abs(posx - posx2) != 0 && abs(posy - posy2) != 0 )) && (array[posy][posx] == 10 || array[posy][posx] == 1))
+	if  ( ( (abs(posx - posx2) == 1) || (abs(posx - posx2) == 0) ) && ( (abs(posy - posy2) == 1) || (abs(posy - posy2) == 0) ) && (array[posy][posx] == 10 || array[posy][posx] == 1))
 	{
 		return true;
 	}else 
@@ -582,7 +590,6 @@ bool validarPeon(char* coord, int turno, int** array)
 		}
 		else 
 		{
-
 			return false;
 		}
 	}
@@ -590,11 +597,11 @@ bool validarPeon(char* coord, int turno, int** array)
 	{
 		if (posy == 6)
 		{
-			if  ( (abs(posx - posx2) == 0) && ((posy2 - posy) == 2 || (posy2 - posy2 == 1)) && (array[posy2][posx2] == 13) && (array[posy][posx] == 12 ) )
+			if  ( (abs(posx - posx2) == 0) && ((posy - posy2) == 2 || (posy - posy2 == 1)) && ((array[posy2][posx2] == 13) && (array[posy][posx] == 12 )) )
 			{
 				return true;
 			}
-			if ( (posy == (posy2 - 1) ) && (abs(posx - posx2) == 1) && (array[posy][posx] == 12) && (piezaComePieza(coord, turno, array)) )
+			if ( (posy == (posy2 + 1) ) && (abs(posx - posx2) == 1) && (array[posy][posx] == 12) && (piezaComePieza(coord, turno, array)) )
 			{
 				return true;
 			}
@@ -608,7 +615,7 @@ bool validarPeon(char* coord, int turno, int** array)
 			{
 				return true;
 			}
-			if ( (posy == (posy2 - 1) ) && (abs(posx - posx2) == 1) && (array[posy][posx] == 12) && (piezaComePieza(coord, turno, array)) )
+			if ( (posy == (posy2 + 1) ) && (abs(posx - posx2) == 1) && (array[posy][posx] == 12) && (piezaComePieza(coord, turno, array)) )
 			{
 				return true;
 			}
@@ -623,7 +630,6 @@ bool validarPeon(char* coord, int turno, int** array)
 		}
 	}	
 }
-
 bool piezaComePieza(char* coord, int turno, int** array)
 {
 	int posx2 = coorX2(coord);
@@ -648,7 +654,210 @@ bool piezaComePieza(char* coord, int turno, int** array)
 		}
 	}
 }
-
+bool diagonalBAJDEIZ(char* coord,int turno,int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy + 1;
+	int contX = posx - 1;
+	while(true) //+-
+	{	
+		if ((contY == posy2 && contX == posx2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			mvprintw(0,0,"Alfil true BAJANDO DER-IZQ");
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			mvprintw(0,0,"Alfil Falso BAJANDO DER-IZQ");
+			return false;
+			break;
+		}else
+		{
+			++contY;
+			--contX;
+		}
+	}
+}
+bool diagonalSUBDEIZ(char* coord,int turno, int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy - 1;
+	int contX = posx - 1;
+	while(true) //--
+	{
+		if ((contY == posy2 && contX == posx2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			mvprintw(0,0,"Alfil true SUBIENDO DER-IZQ");
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			mvprintw(0,0,"Alfil Falso SUBIENDO DER-IZQ");
+			return false;
+			break;
+		}else
+		{
+			--contY;
+			--contX;
+		}
+	}		
+}
+bool diagonalBAJIZDE(char* coord, int turno,int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy + 1;
+	int contX = posx + 1;
+	while(true) //++
+	{
+		if ((contY == posy2 && contX == posx2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			mvprintw(0,0,"Alfil true BAJANDO IZQ-DER");
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			mvprintw(0,0,"Alfil Falso BAJANDO IZQ-DER");
+			return false;
+			break;
+		}else
+		{
+			++contY;
+			++contX;
+		}
+	}
+}
+bool diagonalSUBIZDE(char* coord,int turno, int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy - 1;
+	int contX = posx + 1;
+	while(true) //-+
+	{
+		if ((contY == posy2 && contX == posx2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			mvprintw(0,0,"Alfil true SUBIENDO IZQ-DER");
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			mvprintw(0,0,"Alfil Falso SUBIENDO IZQ-DER");
+			return false;
+			break;
+		}else
+		{
+			--contY;
+			++contX;
+		}
+	}
+}
+bool rectaHorIZQDER(char* coord,int turno,int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy;
+	int contX = posx + 1;
+	while(true)
+	{	
+		if ((contX == posx2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			return false;
+			break;
+		}else
+		{
+			++contX;
+		}
+	}
+}
+bool rectaHorDERIZQ(char* coord,int turno,int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy;
+	int contX = posx - 1;
+	while(true)
+	{	
+		if ((contX == posx2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			return false;
+			break;
+		}else
+		{
+			--contX;
+		}
+	}
+}
+bool rectaVerArrAB(char* coord,int turno,int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy + 1;
+	int contX = posx;
+	while(true)
+	{	
+		if ((contY == posy2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			return false;
+			break;
+		}else
+		{
+			++contY;
+		}
+	}
+}
+bool rectaVerAbArr(char* coord,int turno,int** array)
+{
+	int posx = coorX(coord);
+	int posy = coorY(coord);
+	int posx2 = coorX2(coord);
+	int posy2 = coorY2(coord);
+	int contY = posy - 1;
+	int contX = posx;
+	while(true)
+	{	
+		if ((contY == posy2) && (piezaComePieza(coord, turno, array) || array[contY][contX] ==13)  )
+		{
+			return true;
+			break;
+		}else if (array[contY][contX] != 13)
+		{
+			return false;
+			break;
+		}else
+		{
+			--contY;
+		}
+	}
+}
 bool pasoLibre(char* coord, int turno, int** array)
 {
 	int posx = coorX(coord);
@@ -657,38 +866,31 @@ bool pasoLibre(char* coord, int turno, int** array)
 	int posy2 = coorY2(coord);
 	int diffX = abs(posx - posx2);
 	int diffY = abs(posy - posy2);
+	int contY, contX;
 	if (validarTorre(coord, array))
 	{
 		if (diffX == 0)
 		{
 			if (posy < posy2)//vertical  AR-AB
 			{
-				for (int i = (posy+1) ; i < posy2; ++i)
+				if (rectaVerArrAB(coord, turno, array))
 				{
-					if (array[i][posx] != 13)
-					{
-						return false;
-						break;
-					}
-					else
-					{
-						return true;
-					}
+					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 			else if (posy > posy2)//vertical  AB-AR
 			{
-				for (int i = (posy2+1) ; i < posy; --i)
+				if (rectaVerAbArr(coord, turno, array))
 				{
-					if (array[i][posx] != 13)
-					{
-						return false;
-						break;
-					}
-					else
-					{
-						return true;
-					}
+					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 		}
@@ -696,50 +898,77 @@ bool pasoLibre(char* coord, int turno, int** array)
 		{
 			if (posx < posx2)
 			{
-				for (int i = (posx+1) ; i < posx2; ++i)//Hor DER-IZQ
+				if (rectaHorIZQDER(coord, turno, array))
 				{
-					if (array[posy][i] != 13)
-					{
-						return false;
-						break;
-					}
-					else
-					{
-						return true;
-					}
+					return true;
+				}
+				else 
+				{
+					return false;
 				}
 			}
 			else if (posx > posx2)
 			{
-				for (int i = (posx2+1) ; i < posx; --i)//Hor DER-IZQ
+				if (rectaHorDERIZQ(coord, turno, array))
 				{
-					if (array[posy][i] != 13)
-					{
-						return false;
-						break;
-					}
-					else
-					{
-						return true;
-					}
+					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 		}
 	}
 	else if(validarAlfil(coord, array))
 	{
-		for (int i = (posy+1); i < posy2; ++i)
+		if (posy2 > posy)//BAJANDO
 		{
-			for (int j = (posx+1); j <= (i+1); ++j)
-			{
-				if (array[i][j] != 13)
+			if(posx2 > posx)
+			{ // IZQ-DER
+				if (diagonalBAJIZDE(coord,turno, array))
 				{
-					return false;
-					break;
+					return true;
 				}
 				else
 				{
+					return false;
+				}
+			}
+			else if(posx2 < posx)
+			{ // DER-IZQ
+				if (diagonalBAJDEIZ(coord, turno,array))
+				{
 					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		else if (posy2 < posy)//SUBIENDO
+		{
+			if(posx2 > posx)
+			{ // IZQ-DER
+				if (diagonalSUBIZDE(coord,turno ,array))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else if(posx2 < posx)
+			{ // der-izq
+				if (diagonalSUBDEIZ(coord,turno ,array))
+				{
+					return true;
+				}
+				else	
+				{
+					return false;
 				}
 			}
 		}
@@ -778,33 +1007,107 @@ bool pasoLibre(char* coord, int turno, int** array)
 	{
 		if (diffX == 0)
 		{
-			for (int i = (posy+1) ; i < posy2; ++i)
+			if (posy < posy2)//vertical  AR-AB
 			{
-				if (array[i][posx] != 13)
+				if (rectaVerArrAB(coord, turno, array))
 				{
-					return false;
-					break;
+					return true;
 				}
 				else
 				{
+					return false;
+				}
+			}
+			else if (posy > posy2)//vertical  AB-AR
+			{
+				if (rectaVerAbArr(coord, turno, array))
+				{
 					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 		}
 		else if (diffY == 0)
 		{
-			for (int i = (posx+1) ; i < posx2; ++i)
+			if (posx < posx2)
 			{
-				if (array[posy][i] != 13)
-				{
-					return false;
-					break;
-				}
-				else
+				if (rectaHorIZQDER(coord, turno, array))
 				{
 					return true;
 				}
+				else 
+				{
+					return false;
+				}
 			}
+			else if (posx > posx2)
+			{
+				if (rectaHorDERIZQ(coord, turno, array))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		else if (posy2 > posy)//BAJANDO
+		{
+			if(posx2 > posx)
+			{ // IZQ-DER
+				if (diagonalBAJIZDE(coord,turno, array))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else if(posx2 < posx)
+			{ // DER-IZQ
+				if (diagonalBAJDEIZ(coord, turno,array))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		else if (posy2 < posy)//SUBIENDO
+		{
+			if(posx2 > posx)
+			{ // IZQ-DER
+				if (diagonalSUBIZDE(coord,turno ,array))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else if(posx2 < posx)
+			{ // der-izq
+				if (diagonalSUBDEIZ(coord,turno ,array))
+				{
+					return true;
+				}
+				else	
+				{
+					return false;
+				}
+			}
+		}
+		else
+		{
+			return false;
 		}
 	}
 	else if (validarPeon(coord, turno, array))
